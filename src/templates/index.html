@@ -22,6 +22,7 @@
       padding: 10px;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
 <body>
   <div id="stream-settings">
@@ -68,7 +69,27 @@
           if (!response.ok) {
             throw new Error('Failed to start stream');
           }
-          document.getElementById('live-stream').src = '/live';
+   
+          const video = document.getElementById('live-stream');
+		  const streamURL = '/static/live.m3u8';
+		  
+		  if (Hls.isSupported()) {
+		  	const hls = new Hls();
+		  	hls.loadSource(streamURL);
+		  	hls.attachMedia(video);
+		  	
+		  	console.log('HLS.js supported:', Hls.isSupported());
+			console.log('Stream URL:', streamURL);
+		  	
+		  } else 
+		  if (video.canPlayType('application/vnd.apple.mpegurl')) {
+		  	// Native HLS support (e.g., Safari)
+		  	video.src = streamURL;
+		  	console.log(document.getElementById('live-stream'));
+			console.log(document.getElementById('live-stream').src);
+		  } else {
+		  	alert('Your browser does not support HLS streaming.');
+		  }
         })
         .catch(error => alert(error.message));
     });
