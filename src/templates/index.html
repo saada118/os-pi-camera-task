@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Raspberry Pi Live Stream</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .input-group {
+      margin-bottom: 15px;
+    }
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .video-container {
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="stream-settings">
+    <h2>Live Stream Settings</h2>
+    <div class="input-group">
+      <label for="resolution">Resolution (e.g., 1280x720):</label>
+      <input type="text" id="resolution" placeholder="Enter resolution" value="1280x720" />
+    </div>
+    <div class="input-group">
+      <label for="bitrate">Bitrate (e.g., 1000k):</label>
+      <input type="text" id="bitrate" placeholder="Enter bitrate" value="1000k" />
+    </div>
+    <div class="input-group">
+      <label for="framerate">Frame Rate (e.g., 30):</label>
+      <input type="number" id="framerate" placeholder="Enter framerate" value="30" />
+    </div>
+    <button id="start-stream">Start Stream</button>
+  </div>
+
+  <div class="video-container">
+    <h2>Live Stream</h2>
+    <video id="live-stream" controls autoplay></video>
+  </div>
+
+  <script>
+    document.getElementById('start-stream').addEventListener('click', () => {
+      const resolution = document.getElementById('resolution').value;
+      const bitrate = document.getElementById('bitrate').value;
+      const framerate = document.getElementById('framerate').value;
+
+      if (!resolution || !bitrate || !framerate) {
+        alert('Please fill all fields!');
+        return;
+      }
+
+      fetch('/start-stream', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ resolution, bitrate, framerate }),
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to start stream');
+          }
+          document.getElementById('live-stream').src = '/live';
+        })
+        .catch(error => alert(error.message));
+    });
+  </script>
+</body>
+</html>
